@@ -19,6 +19,20 @@ const io = new Server(httpServer, {
 // Game state
 const rooms = {};
 
+// Define spawn positions for players
+const spawnPositions = [
+  { x: -8, y: 0, z: -8 },
+  { x: 8, y: 0, z: -8 },
+  { x: -8, y: 0, z: 8 },
+  { x: 8, y: 0, z: 8 },
+  { x: 0, y: 0, z: -10 },
+  { x: 0, y: 0, z: 10 },
+  { x: -10, y: 0, z: 0 },
+  { x: 10, y: 0, z: 0 },
+  { x: -5, y: 0, z: -5 },
+  { x: 5, y: 0, z: 5 }
+];
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
@@ -48,10 +62,18 @@ io.on('connection', (socket) => {
     const playerName = customization?.name || 'Player';
     const playerColor = customization?.color || PLAYER_COLORS[0];
     
+    // Assign a spawn position to the host player
+    const spawnPosition = spawnPositions[0];
+    
     rooms[roomCode].players[socket.id] = {
       name: playerName,
       color: playerColor,
-      isImpostor: false
+      isImpostor: false,
+      position: {
+        x: spawnPosition.x,
+        y: spawnPosition.y,
+        z: spawnPosition.z
+      }
     };
     
     // Log room creation
@@ -90,10 +112,18 @@ io.on('connection', (socket) => {
     const playerName = customization?.name || 'Player';
     const playerColor = customization?.color || PLAYER_COLORS[playerCount];
     
+    // Assign a spawn position based on player count
+    const spawnPosition = spawnPositions[playerCount % spawnPositions.length];
+    
     rooms[roomCode].players[socket.id] = {
       name: playerName,
       color: playerColor,
-      isImpostor: false
+      isImpostor: false,
+      position: {
+        x: spawnPosition.x,
+        y: spawnPosition.y,
+        z: spawnPosition.z
+      }
     };
     
     // Log player joining
@@ -148,13 +178,27 @@ io.on('connection', (socket) => {
       rooms[currentRoom].players[playerIds[i]].isImpostor = true;
     }
     
+    // Assign spawn positions to players
+    playerIds.forEach((playerId, index) => {
+      // Use modulo to cycle through spawn positions if there are more players than positions
+      const spawnPosition = spawnPositions[index % spawnPositions.length];
+      
+      // Assign position to player
+      rooms[currentRoom].players[playerId].position = {
+        x: spawnPosition.x,
+        y: spawnPosition.y,
+        z: spawnPosition.z
+      };
+    });
+    
     // Notify all players that the game has started
     io.to(currentRoom).emit('gameStarted');
     
-    // Send role assignments to each player
+    // Send role assignments and spawn positions to each player
     playerIds.forEach(playerId => {
       io.to(playerId).emit('roleAssigned', {
-        isImpostor: rooms[currentRoom].players[playerId].isImpostor
+        isImpostor: rooms[currentRoom].players[playerId].isImpostor,
+        position: rooms[currentRoom].players[playerId].position
       });
     });
   });

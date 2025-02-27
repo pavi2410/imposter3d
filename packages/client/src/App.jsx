@@ -82,7 +82,8 @@ const App = () => {
           name: playerCustomization.name,
           color: playerCustomization.color,
           isLocal: true,
-          isImpostor: false
+          isImpostor: false,
+          position: { x: 0, y: 0, z: 0 } // Default position until server sends the actual position
         }
       }));
     });
@@ -125,7 +126,8 @@ const App = () => {
         ...prevPlayers,
         [socketInstance.id]: {
           ...prevPlayers[socketInstance.id],
-          isImpostor: role.isImpostor
+          isImpostor: role.isImpostor,
+          position: role.position
         }
       }));
     });

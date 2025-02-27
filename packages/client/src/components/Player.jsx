@@ -94,8 +94,9 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
   
   // Update position for non-local players
   useEffect(() => {
-    if (isLocalPlayer || !groupRef.current || !player.position) return;
+    if (!groupRef.current || !player.position) return;
     
+    // Set initial position for both local and remote players
     groupRef.current.position.set(
       player.position.x,
       player.position.y,
@@ -109,7 +110,7 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
         player.rotation.z
       );
     }
-  }, [player.position, player.rotation, isLocalPlayer]);
+  }, [player.position, player.rotation]);
   
   return (
     <group ref={groupRef}>
