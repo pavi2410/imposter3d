@@ -276,7 +276,7 @@ const App = () => {
   
   return (
     <>
-      <Canvas shadows camera={{ position: [0, 5, 10], fov: 75 }}>
+      <Canvas shadows>
         <ambientLight intensity={0.4} />
         <directionalLight
           position={[5, 10, 7.5]}
@@ -323,8 +323,7 @@ const App = () => {
           />
         )}
         
-        {/* Controls for camera */}
-        {gameState === 'game' && <OrbitControls enableDamping dampingFactor={0.05} />}
+        {/* First-person perspective is now handled by the Player component */}
       </Canvas>
       
       {/* Player Customization */}

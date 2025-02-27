@@ -1,9 +1,12 @@
 import React, { useRef, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PerspectiveCamera } from '@react-three/drei';
 
 const Player = ({ player, isLocalPlayer, updatePosition }) => {
   const groupRef = useRef();
+  const cameraRef = useRef();
+  const { camera } = useThree();
   const keys = useRef({
     forward: false,
     backward: false,
@@ -66,12 +69,12 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
     const rotationSpeed = 0.05;
     
     if (keys.current.forward) {
-      groupRef.current.position.z += Math.cos(groupRef.current.rotation.y) * speed;
-      groupRef.current.position.x += Math.sin(groupRef.current.rotation.y) * speed;
-    }
-    if (keys.current.backward) {
       groupRef.current.position.z -= Math.cos(groupRef.current.rotation.y) * speed;
       groupRef.current.position.x -= Math.sin(groupRef.current.rotation.y) * speed;
+    }
+    if (keys.current.backward) {
+      groupRef.current.position.z += Math.cos(groupRef.current.rotation.y) * speed;
+      groupRef.current.position.x += Math.sin(groupRef.current.rotation.y) * speed;
     }
     if (keys.current.left) {
       groupRef.current.rotation.y += rotationSpeed;
@@ -90,6 +93,12 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
       y: groupRef.current.rotation.y,
       z: groupRef.current.rotation.z
     });
+    
+    // Update the main camera to match the first-person camera if this is the local player
+    if (isLocalPlayer && cameraRef.current) {
+      camera.position.copy(cameraRef.current.position);
+      camera.rotation.copy(cameraRef.current.rotation);
+    }
   });
   
   // Update position for non-local players
@@ -114,36 +123,51 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
   
   return (
     <group ref={groupRef}>
-      {/* Body (slightly squashed sphere) */}
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <sphereGeometry args={[0.5, 16, 16]} scale={[1, 1.2, 1]} />
-        <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
-      </mesh>
+      {/* First-person camera for local player */}
+      {isLocalPlayer && (
+        <PerspectiveCamera
+          ref={cameraRef}
+          makeDefault={true}
+          position={[0, 1.0, 0]} // Position at eye level
+          fov={75}
+          near={0.1}
+          far={1000}
+        />
+      )}
       
-      {/* Visor (small blue rectangle on front of body) */}
-      <mesh position={[0, 0.6, 0.45]}>
-        <boxGeometry args={[0.4, 0.2, 0.1]} />
-        <meshLambertMaterial color={0x99ccff} />
-      </mesh>
-      
-      {/* Legs */}
-      <mesh position={[-0.25, -0.25, 0]}>
-        <cylinderGeometry args={[0.15, 0.15, 0.5]} />
-        <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
-      </mesh>
-      
-      <mesh position={[0.25, -0.25, 0]}>
-        <cylinderGeometry args={[0.15, 0.15, 0.5]} />
-        <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
-      </mesh>
-      
-      {/* Name tag for non-local players */}
+      {/* Only render player model if not local player (in first person you don't see yourself) */}
       {!isLocalPlayer && (
-        <sprite position={[0, 1.5, 0]} scale={[2, 0.5, 1]}>
-          <spriteMaterial>
-            <canvasTexture attach="map" image={createNameTag(player.name || `Player ${player.id.substring(0, 4)}`)} />
-          </spriteMaterial>
-        </sprite>
+        <>
+          {/* Body (slightly squashed sphere) */}
+          <mesh position={[0, 0.5, 0]} castShadow>
+            <sphereGeometry args={[0.5, 16, 16]} scale={[1, 1.2, 1]} />
+            <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
+          </mesh>
+          
+          {/* Visor (small blue rectangle on front of body) */}
+          <mesh position={[0, 0.6, 0.45]}>
+            <boxGeometry args={[0.4, 0.2, 0.1]} />
+            <meshLambertMaterial color={0x99ccff} />
+          </mesh>
+          
+          {/* Legs */}
+          <mesh position={[-0.25, -0.25, 0]}>
+            <cylinderGeometry args={[0.15, 0.15, 0.5]} />
+            <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
+          </mesh>
+          
+          <mesh position={[0.25, -0.25, 0]}>
+            <cylinderGeometry args={[0.15, 0.15, 0.5]} />
+            <meshLambertMaterial color={player.color ? new THREE.Color(player.color) : 0x00ff00} />
+          </mesh>
+          
+          {/* Name tag for other players */}
+          <sprite position={[0, 1.5, 0]} scale={[2, 0.5, 1]}>
+            <spriteMaterial>
+              <canvasTexture attach="map" image={createNameTag(player.name || `Player ${player.id.substring(0, 4)}`)} />
+            </spriteMaterial>
+          </sprite>
+        </>
       )}
     </group>
   );
