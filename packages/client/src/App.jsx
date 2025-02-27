@@ -332,6 +332,7 @@ const App = () => {
       {gameState === 'customization' && (
         <PlayerCustomization 
           onCustomizationComplete={pendingAction === 'edit' ? applyCustomizationChanges : handleCustomizationComplete}
+          onCancel={() => setGameState('menu')}
         />
       )}
       

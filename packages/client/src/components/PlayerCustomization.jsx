@@ -53,17 +53,24 @@ function createNameTag(playerName) {
   const context = canvas.getContext('2d');
   canvas.width = 256;
   canvas.height = 64;
-  context.font = '48px Arial';
+  context.font = '48px "Comic Sans MS", "Comic Sans", cursive';
   context.fillStyle = 'white';
   context.textAlign = 'center';
   context.fillText(playerName || 'Player', 128, 48);
   return canvas;
 }
 
-const PlayerCustomization = ({ onCustomizationComplete }) => {
+const PlayerCustomization = ({ onCustomizationComplete, onCancel }) => {
   const [playerName, setPlayerName] = useState('Player');
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [showCustomization, setShowCustomization] = useState(true);
+  
+  const handleClose = () => {
+    setShowCustomization(false);
+    if (onCancel) {
+      onCancel();
+    }
+  };
   
   const handleNameChange = (e) => {
     setPlayerName(e.target.value);
@@ -85,6 +92,7 @@ const PlayerCustomization = ({ onCustomizationComplete }) => {
   
   return (
     <div className="customization-container menu">
+      <button className="close-button" onClick={handleClose}>X</button>
       <h2>Customize Your Character</h2>
       
       <div className="customization-preview">
