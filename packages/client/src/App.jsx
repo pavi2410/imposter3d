@@ -12,6 +12,7 @@ import ImpostorActions from './components/ImpostorActions';
 import { TaskManager } from './components/Tasks';
 import PlayerCustomization from './components/PlayerCustomization';
 import SpaceBackground from './components/SpaceBackground';
+import EscapeMenu from './components/EscapeMenu';
 
 // Hooks
 import useQueryParam from './hooks/useQueryParam';
@@ -30,6 +31,7 @@ const App = () => {
     name: 'Player',
     color: PLAYER_COLORS[0]
   });
+  const [escapeMenuVisible, setEscapeMenuVisible] = useState(false);
   
   // Initialize socket connection once when component mounts
   useEffect(() => {
@@ -83,7 +85,7 @@ const App = () => {
           color: playerCustomization.color,
           isLocal: true,
           isImpostor: false,
-          position: { x: 0, y: 0, z: 0 } // Default position until server sends the actual position
+          position: { x: 0, y: 0, z: -3 } // Default position inside the main corridor
         }
       }));
     });
@@ -346,6 +348,15 @@ const App = () => {
         isHost={localPlayerId && players[localPlayerId] && 
                Object.keys(players)[0] === localPlayerId}
       />
+      
+      {/* Escape Menu */}
+      {gameState === 'game' && (
+        <EscapeMenu 
+          isVisible={escapeMenuVisible} 
+          setIsVisible={setEscapeMenuVisible} 
+          onLeaveGame={leaveGame} 
+        />
+      )}
     </>
   );
 };
