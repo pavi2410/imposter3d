@@ -1,0 +1,17 @@
+{
+  "name": "imposter3d",
+  "version": "0.1.0",
+  "description": "3D Among Us clone with multiplayer support",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run -F ./packages/client dev",
+    "build": "bun run -F ./packages/client build",
+    "preview": "bun run -F ./packages/client preview",
+    "server": "bun run -F ./packages/server start"
+  },
+  "devDependencies": {}
+}
