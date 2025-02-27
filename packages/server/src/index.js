@@ -10,7 +10,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Create HTTP server
 const httpServer = createServer();
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    credentials: true
+  }
+});
 
 // Game state
 const rooms = {};

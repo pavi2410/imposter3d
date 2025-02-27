@@ -38,7 +38,7 @@ const App = () => {
     ]);
     
     // Initialize socket connection
-    const socketInstance = io();
+    const socketInstance = io(import.meta.env.VITE_SERVER_URL);
     setSocket(socketInstance);
     
     socketInstance.on('connect', () => {
