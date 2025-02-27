@@ -1,0 +1,71 @@
+/* UI Component Styles */
+
+/* Player list styles */
+.player-names-list {
+  margin: 15px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  border: 2px solid #444;
+}
+
+.player-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  border: 2px solid #333;
+}
+
+.player-entry.ready {
+  border-color: #00cc00;
+  background-color: rgba(0, 100, 0, 0.3);
+}
+
+.player-entry.host {
+  border-color: #ffcc00;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.host-badge {
+  background-color: #ffcc00;
+  color: black;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.ready-status {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.player-entry.ready .ready-status {
+  color: #00ff00;
+}
+
+.ready-count {
+  font-size: 16px;
+  margin: 10px 0;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.ready-count span {
+  font-weight: bold;
+  color: #00ff00;
+}

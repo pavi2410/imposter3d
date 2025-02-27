@@ -348,6 +348,7 @@ const App = () => {
         onEditCustomization={handleEditCustomization}
         isHost={localPlayerId && players[localPlayerId] && 
                Object.keys(players)[0] === localPlayerId}
+        players={players}
       />
       
       {/* Escape Menu */}

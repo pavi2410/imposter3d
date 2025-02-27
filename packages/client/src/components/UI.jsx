@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './UI.css';
 
 const UI = ({
   gameState,
@@ -9,7 +10,8 @@ const UI = ({
   onStartGame,
   onLeaveGame,
   onEditCustomization,
-  isHost
+  isHost,
+  players = {}
 }) => {
   const handleJoinGame = () => {
     const code = prompt('Enter room code:');
@@ -35,6 +37,20 @@ const UI = ({
           <h1>LOBBY</h1>
           <div id="room-code">Room Code: <span id="room-code-value">{roomCode}</span></div>
           <div id="player-list">Players: <span id="player-count">{playerCount}/10</span></div>
+          
+          {/* Player list display */}
+          <div className="player-names-list">
+            {Object.values(players).map(player => (
+              <div key={player.id} className={`player-entry ${player.isReady ? 'ready' : ''} ${Object.keys(players)[0] === player.id ? 'host' : ''}`}>
+                <span className="player-name">{player.name || `Player ${player.id.substring(0, 4)}`}</span>
+                {Object.keys(players)[0] === player.id && <span className="host-badge">Host</span>}
+                <span className="ready-status">{player.isReady ? '✓ Ready' : 'Not Ready'}</span>
+              </div>
+            ))}
+          </div>
+          
+          <div className="ready-count">Ready: <span>{Object.values(players).filter(p => p.isReady).length}/{playerCount}</span></div>
+          
           <button onClick={onEditCustomization}>Edit Character</button>
           <button 
             onClick={onStartGame} 
