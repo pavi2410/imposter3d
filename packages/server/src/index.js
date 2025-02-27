@@ -24,6 +24,11 @@ io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
   let currentRoom = null;
   
+  // Check if a room exists
+  socket.on('checkRoomExists', (roomCode, callback) => {
+    callback(rooms.hasOwnProperty(roomCode));
+  });
+  
   // Create a new game room
   socket.on('createRoom', (customization) => {
     const roomCode = generateRoomCode();
@@ -40,11 +45,17 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     
     // Add player to room data with customization
+    const playerName = customization?.name || 'Player';
+    const playerColor = customization?.color || PLAYER_COLORS[0];
+    
     rooms[roomCode].players[socket.id] = {
-      name: customization?.name || 'Player',
-      color: customization?.color || PLAYER_COLORS[0],
+      name: playerName,
+      color: playerColor,
       isImpostor: false
     };
+    
+    // Log room creation
+    console.log(`Room created: ${roomCode} | Host: ${socket.id} (${playerName}) | Color: ${playerColor}`);
     
     // Notify the client that the room was created
     socket.emit('roomCreated', roomCode);
@@ -76,19 +87,25 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     
     // Assign customization to the player
+    const playerName = customization?.name || 'Player';
+    const playerColor = customization?.color || PLAYER_COLORS[playerCount];
+    
     rooms[roomCode].players[socket.id] = {
-      name: customization?.name || 'Player',
-      color: customization?.color || PLAYER_COLORS[playerCount],
+      name: playerName,
+      color: playerColor,
       isImpostor: false
     };
+    
+    // Log player joining
+    console.log(`Player joined: ${socket.id} (${playerName}) | Room: ${roomCode} | Color: ${playerColor} | Players in room: ${playerCount + 1}`);
     
     // Notify the client that they joined the room
     socket.emit('joinedRoom', roomCode, rooms[roomCode].players);
     
     // Notify other players in the room
     socket.to(roomCode).emit('playerJoined', socket.id, {
-      name: rooms[roomCode].players[socket.id].name,
-      color: rooms[roomCode].players[socket.id].color
+      name: playerName,
+      color: playerColor
     });
   });
   
@@ -96,17 +113,20 @@ io.on('connection', (socket) => {
   socket.on('startGame', () => {
     // Check if the player is in a room
     if (!currentRoom || !rooms[currentRoom]) {
+      socket.emit('error', 'Room does not exist');
       return;
     }
     
     // Check if the player is the host
     if (rooms[currentRoom].host !== socket.id) {
+      socket.emit('error', 'Only the host can start the game');
       return;
     }
     
     // Check if there are at least 2 players
     const playerCount = Object.keys(rooms[currentRoom].players).length;
     if (playerCount < 2) {
+      socket.emit('error', 'Need at least 2 players to start');
       return;
     }
     

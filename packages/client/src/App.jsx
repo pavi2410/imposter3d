@@ -11,13 +11,17 @@ import UI from './components/UI';
 import ImpostorActions from './components/ImpostorActions';
 import { TaskManager } from './components/Tasks';
 import PlayerCustomization from './components/PlayerCustomization';
+import SpaceBackground from './components/SpaceBackground';
+
+// Hooks
+import useQueryParam from './hooks/useQueryParam';
 
 const App = () => {
   const [socket, setSocket] = useState(null);
   const [gameState, setGameState] = useState('menu'); // menu, customization, lobby, game
   const [players, setPlayers] = useState({});
   const [localPlayerId, setLocalPlayerId] = useState(null);
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCode, setRoomCode] = useQueryParam('room', '');
   const [tasks, setTasks] = useState([]);
   const [gameResult, setGameResult] = useState(null); // null, 'crewmates', 'impostors'
   const [pendingAction, setPendingAction] = useState(null); // null, 'create', 'join'
@@ -27,6 +31,7 @@ const App = () => {
     color: PLAYER_COLORS[0]
   });
   
+  // Initialize socket connection once when component mounts
   useEffect(() => {
     // Initialize tasks
     setTasks([
@@ -37,7 +42,7 @@ const App = () => {
       { id: 'task5', position: [0, 0, 0], type: 'simple' }
     ]);
     
-    // Initialize socket connection
+    // Initialize socket connection - only once when component mounts
     const socketInstance = io(import.meta.env.VITE_SERVER_URL);
     setSocket(socketInstance);
     
@@ -68,7 +73,7 @@ const App = () => {
     socketInstance.on('roomCreated', (code) => {
       console.log('Room created:', code);
       setGameState('lobby');
-      setRoomCode(code);
+      setRoomCode(code); // This will update the URL automatically
       setLocalPlayerId(socketInstance.id);
       setPlayers(prevPlayers => ({
         ...prevPlayers,
@@ -172,10 +177,31 @@ const App = () => {
       }, 3000);
     });
     
+    // Room code handling is now done at the end of this effect
+    
+    // If there's a room code in the URL, check if the room exists before joining
+    const roomCodeFromUrl = roomCode;
+    if (roomCodeFromUrl) {
+      // First, check if the room exists
+      socketInstance.emit('checkRoomExists', roomCodeFromUrl, (exists) => {
+        if (exists) {
+          setPendingAction('join');
+          setPendingRoomCode(roomCodeFromUrl);
+          setGameState('customization');
+        } else {
+          setRoomCode(''); // Clear the invalid room code from URL first
+          // Add a small delay before showing the alert to ensure the UI updates first
+          setTimeout(() => {
+            alert('Room does not exist');
+          }, 100);
+        }
+      });
+    }
+    
     return () => {
       socketInstance.disconnect();
     };
-  }, []);
+  }, []); // Empty dependency array ensures this effect runs only once when component mounts
   
   const createGame = () => {
     setPendingAction('create');
@@ -196,7 +222,7 @@ const App = () => {
     socket.emit('leaveRoom');
     setGameState('menu');
     setPlayers({});
-    setRoomCode('');
+    setRoomCode(''); // This will remove the room code from URL automatically
   };
   
   const updatePlayerPosition = (position, rotation) => {
@@ -257,6 +283,9 @@ const App = () => {
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
+        
+        {/* Space Background */}
+        <SpaceBackground />
         
         {/* Game world */}
         <GameMap />
