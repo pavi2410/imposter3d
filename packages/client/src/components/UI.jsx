@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './UI.css';
 
 const UI = ({
@@ -20,6 +20,19 @@ const UI = ({
     }
   };
 
+  const [copySuccess, setCopySuccess] = useState(false);
+  
+  const handleCopyRoomCode = () => {
+    navigator.clipboard.writeText(roomCode)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy room code:', err);
+      });
+  };
+
   return (
     <div id="ui-container">
       {/* Main Menu */}
@@ -35,7 +48,18 @@ const UI = ({
       {gameState === 'lobby' && (
         <div id="lobby-menu" className="menu">
           <h1>LOBBY</h1>
-          <div id="room-code">Room Code: <span id="room-code-value">{roomCode}</span></div>
+          <div id="room-code" className="room-code-container">
+            Room Code: 
+            <span 
+              id="room-code-value" 
+              className="room-code-value" 
+              onClick={handleCopyRoomCode}
+              title="Click to copy"
+            >
+              {roomCode}
+            </span>
+            {copySuccess && <span className="copy-tooltip">Copied!</span>}
+          </div>
           <div id="player-list">Players: <span id="player-count">{playerCount}/10</span></div>
           
           {/* Player list display */}

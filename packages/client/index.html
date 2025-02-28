@@ -73,7 +73,7 @@
     .menu h1 {
       color: #ff0000;
       margin-top: 0;
-      text-shadow: 3px 3px 0px #ffcc00, 5px 5px 0px #ff6600;
+      text-shadow: 3px 3px 0px #ffcc00, 5px 5px 0px #ff6600, 0px 0px 10px #ffffff;
       font-size: 2.5em;
       letter-spacing: 2px;
       transform: rotate(-2deg);
@@ -94,6 +94,7 @@
       position: relative;
       transition: all 0.2s;
       transform: rotate(1deg);
+      text-shadow: 1px 1px 3px #000000, -1px -1px 3px #000000;
     }
     
     /* Set cursor styles for different elements */
@@ -138,6 +139,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      color: white;
     }
     
     .escape-menu::before {
@@ -155,7 +157,7 @@
     .escape-menu h2 {
       color: #ff0000;
       margin-top: 0;
-      text-shadow: 2px 2px 0px #ffcc00, 4px 4px 0px #ff6600;
+      text-shadow: 2px 2px 0px #ffcc00, 4px 4px 0px #ff6600, 0px 0px 10px #ffffff;
       font-size: 2em;
       letter-spacing: 2px;
       transform: rotate(-2deg);
@@ -188,12 +190,14 @@
       transform: scale(1.1);
     }
     
-    /* Ensure all text elements use Comic Sans */
+    /* Ensure all text elements use Comic Sans and have good visibility */
     .customization-container h2,
     .customization-container label,
     .customization-container input,
     .customization-container button {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      color: white;
+      text-shadow: 1px 1px 3px #000000, -1px -1px 3px #000000, 1px -1px 3px #000000, -1px 1px 3px #000000;
     }
     
     /* Style for color selection grid with thicker borders */
