@@ -8,11 +8,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run -F ./packages/client dev",
     "build": "bun run -F ./packages/client build",
     "preview": "bun run -F ./packages/client preview",
     "server": "bun run -F ./packages/server start",
-    "server:dev": "bun run -F ./packages/server dev"
+    "dev": "bun run -F @imposter3d/* dev"
   },
   "devDependencies": {}
 }
