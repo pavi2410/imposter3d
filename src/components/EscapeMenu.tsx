@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-const EscapeMenu = ({ onLeaveGame, isVisible, setIsVisible }) => {
+interface EscapeMenuProps {
+  onLeaveGame: () => void;
+  isVisible: boolean;
+  setIsVisible: (visible: boolean | ((prev: boolean) => boolean)) => void;
+}
+
+const EscapeMenu = ({ onLeaveGame, isVisible, setIsVisible }: EscapeMenuProps) => {
   // Handle escape key press
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsVisible(prev => !prev);
       }
@@ -17,8 +23,8 @@ const EscapeMenu = ({ onLeaveGame, isVisible, setIsVisible }) => {
   }, [setIsVisible]);
   
   // Handle click outside to close menu
-  const handleBackgroundClick = (e) => {
-    if (e.target.id === 'escape-menu-overlay') {
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).id === 'escape-menu-overlay') {
       setIsVisible(false);
     }
   };

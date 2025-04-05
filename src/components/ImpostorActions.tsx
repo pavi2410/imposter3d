@@ -1,10 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { Text } from '@react-three/drei';
+import { Position } from '../db';
 
-const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPosition }) => {
+interface Player {
+  id: string;
+  position?: Position;
+  isImpostor?: boolean;
+}
+
+interface Socket {
+  emit: (event: string, data: any) => void;
+}
+
+interface ImpostorActionsProps {
+  isImpostor: boolean;
+  socket: Socket;
+  players: Record<string, Player>;
+  localPlayerId: string;
+  playerPosition: Position;
+}
+
+const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPosition }: ImpostorActionsProps) => {
   const [killCooldown, setKillCooldown] = useState(0);
-  const [nearbyPlayers, setNearbyPlayers] = useState([]);
+  const [nearbyPlayers, setNearbyPlayers] = useState<string[]>([]);
   const killDistance = 2; // How close impostor needs to be to kill
   const maxCooldown = 30; // 30 seconds cooldown between kills
   
@@ -40,13 +59,13 @@ const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPos
   
   // Handle kill cooldown
   useEffect(() => {
-    let cooldownInterval;
+    let cooldownInterval: NodeJS.Timeout | undefined;
     
     if (killCooldown > 0) {
       cooldownInterval = setInterval(() => {
         setKillCooldown(prev => {
           if (prev <= 1) {
-            clearInterval(cooldownInterval);
+            if (cooldownInterval) clearInterval(cooldownInterval);
             return 0;
           }
           return prev - 1;
@@ -60,7 +79,7 @@ const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPos
   }, [killCooldown]);
   
   // Handle kill action
-  const handleKill = (targetId) => {
+  const handleKill = (targetId: string) => {
     if (killCooldown === 0 && nearbyPlayers.includes(targetId)) {
       socket.emit('killPlayer', targetId);
       setKillCooldown(maxCooldown);
@@ -71,7 +90,7 @@ const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPos
   useEffect(() => {
     if (!isImpostor) return;
     
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'q' && nearbyPlayers.length > 0 && killCooldown === 0) {
         // Kill the closest player
         handleKill(nearbyPlayers[0]);
@@ -97,7 +116,6 @@ const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPos
           anchorX="center"
           anchorY="middle"
           renderOrder={1000}
-          depthTest={false} // Make sure it's always visible
         >
           Kill: {killCooldown}s
         </Text>
@@ -112,7 +130,6 @@ const ImpostorActions = ({ isImpostor, socket, players, localPlayerId, playerPos
           anchorX="center"
           anchorY="middle"
           renderOrder={1000}
-          depthTest={false} // Make sure it's always visible
         >
           Press Q to Kill
         </Text>

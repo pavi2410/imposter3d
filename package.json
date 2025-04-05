@@ -2,16 +2,29 @@
   "name": "imposter3d",
   "version": "0.1.0",
   "description": "3D Among Us clone with multiplayer support",
-  "type": "module",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "type": "module",
   "scripts": {
-    "build": "bun run -F ./packages/client build",
-    "preview": "bun run -F ./packages/client preview",
-    "server": "bun run -F ./packages/server start",
-    "dev": "bun run -F @imposter3d/* dev"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "@react-three/drei": "^10.0.3",
+    "@react-three/fiber": "^9.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@instantdb/react": "^0.17.32",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.4",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "^0.174.0",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2"
+  }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { PLAYER_COLORS } from '@imposter3d/shared';
+import { PLAYER_COLORS } from '../shared/constants';
 
 // Component for player preview in customization screen
 const PlayerPreview = ({ playerName, playerColor }) => {

@@ -1,7 +1,35 @@
-import React from 'react';
 import * as THREE from 'three';
-import { TaskManager } from './Tasks';
 import { Text } from '@react-three/drei';
+import { TaskManager } from './Tasks';
+
+interface Position {
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface WallProps {
+  position: [number, number, number];
+  width: number;
+  height: number;
+  rotation?: [number, number, number];
+  color?: number;
+  stripeColor?: number;
+  hasStripe?: boolean;
+}
+
+interface TaskProps {
+  position: [number, number, number];
+}
+
+interface WallDetailsProps {
+  width: number;
+  height: number;
+}
+
+interface RoomProps {
+  position: [number, number, number];
+}
 
 const GameMap = () => {
   return (
@@ -43,18 +71,18 @@ const GameMap = () => {
 };
 
 // Spaceship Wall component with metallic look and colored stripe
-const Wall = ({ position, width, height, rotation = [0, 0, 0], color = 0x1a3b5c, stripeColor = 0xffcc00, hasStripe = true }) => {
+const Wall = ({ position, width, height, rotation = [0, 0, 0], color = 0x1a3b5c, stripeColor = 0xffcc00, hasStripe = true }: WallProps) => {
   return (
-    <group position={position} rotation={rotation}>
+    <group position={position}>
       {/* Main wall */}
-      <mesh castShadow receiveShadow>
+      <mesh castShadow receiveShadow rotation={rotation}>
         <boxGeometry args={[width, height, 0.2]} />
         <meshStandardMaterial color={color} roughness={0.4} metalness={0.7} side={THREE.DoubleSide} />
       </mesh>
       
       {/* Colored stripe */}
       {hasStripe && (
-        <mesh position={[0, 0, 0.11]} castShadow>
+        <mesh position={[0, 0, 0.11]} castShadow rotation={rotation}>
           <boxGeometry args={[width, height * 0.1, 0.02]} />
           <meshStandardMaterial color={stripeColor} roughness={0.3} metalness={0.5} emissive={stripeColor} emissiveIntensity={0.2} side={THREE.DoubleSide} />
         </mesh>
@@ -67,7 +95,7 @@ const Wall = ({ position, width, height, rotation = [0, 0, 0], color = 0x1a3b5c,
 };
 
 // Task component - now styled as spaceship control panels
-const Task = ({ position }) => {
+const Task = ({ position }: TaskProps) => {
   return (
     <group position={position}>
       {/* Control panel base */}
@@ -159,7 +187,7 @@ const SpaceshipCorridor = () => {
 };
 
 // Wall details like rivets and panels
-const WallDetails = ({ width, height }) => {
+const WallDetails = ({ width, height }: WallDetailsProps) => {
   const panelWidth = 1;
   const panelHeight = 0.8;
   const panels = [];
@@ -199,7 +227,7 @@ const WallDetails = ({ width, height }) => {
 };
 
 // Medical Bay with blue cross symbol
-const MedicalBay = ({ position }) => {
+const MedicalBay = ({ position }: RoomProps) => {
   return (
     <group position={position}>
       {/* Room walls */}
@@ -225,7 +253,7 @@ const MedicalBay = ({ position }) => {
 };
 
 // Engine Room with machinery
-const EngineRoom = ({ position }) => {
+const EngineRoom = ({ position }: RoomProps) => {
   return (
     <group position={position}>
       {/* Room walls */}
@@ -253,7 +281,7 @@ const EngineRoom = ({ position }) => {
 };
 
 // Navigation Room with controls
-const NavigationRoom = ({ position }) => {
+const NavigationRoom = ({ position }: RoomProps) => {
   return (
     <group position={position}>
       {/* Room walls */}
@@ -281,7 +309,7 @@ const NavigationRoom = ({ position }) => {
 };
 
 // Electrical Room with wiring
-const ElectricalRoom = ({ position }) => {
+const ElectricalRoom = ({ position }: RoomProps) => {
   return (
     <group position={position}>
       {/* Room walls */}
@@ -311,7 +339,7 @@ const ElectricalRoom = ({ position }) => {
 };
 
 // Central Meeting Area
-const MeetingArea = ({ position }) => {
+const MeetingArea = ({ position }: RoomProps) => {
   return (
     <group position={position}>
       {/* Central table */}

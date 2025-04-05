@@ -41,9 +41,7 @@ The game uses Socket.IO for real-time communication between clients and server. 
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `createRoom` | `{ name, color }` | Creates a new game room with player customization |
-| `joinRoom` | `roomCode, { name, color }` | Joins an existing room with the given code |
-| `leaveRoom` | - | Leaves the current room |
+| `joinWorld` | `{ name, color }` | Enters the persistent world with player customization |
 | `startGame` | - | Starts the game (host only) |
 | `updatePlayer` | `{ position, rotation }` | Updates player position and rotation |
 | `killPlayer` | `targetId` | Impostor action to kill another player |
@@ -54,8 +52,7 @@ The game uses Socket.IO for real-time communication between clients and server. 
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `roomCreated` | `roomCode` | Confirms room creation with room code |
-| `joinedRoom` | `roomCode, players` | Confirms room join with room code and existing players |
+| `worldState` | `players` | Sends complete world state on connection |
 | `playerJoined` | `playerId, playerData` | Notifies when a new player joins |
 | `playerLeft` | `playerId` | Notifies when a player leaves |
 | `gameStarted` | - | Notifies that the game has started |

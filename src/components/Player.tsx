@@ -1,13 +1,35 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, RefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PerspectiveCamera } from '@react-three/drei';
+import { Position } from '../db';
 
-const Player = ({ player, isLocalPlayer, updatePosition }) => {
-  const groupRef = useRef();
-  const cameraRef = useRef();
+interface PlayerData {
+  id: string;
+  name?: string;
+  position?: Position;
+  rotation?: Position;
+  color?: string;
+}
+
+interface PlayerProps {
+  player: PlayerData;
+  isLocalPlayer: boolean;
+  updatePosition: (position: Position, rotation: Position) => void;
+}
+
+interface Keys {
+  forward: boolean;
+  backward: boolean;
+  left: boolean;
+  right: boolean;
+}
+
+const Player = ({ player, isLocalPlayer, updatePosition }: PlayerProps) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera>(null);
   const { camera } = useThree();
-  const keys = useRef({
+  const keys = useRef<Keys>({
     forward: false,
     backward: false,
     left: false,
@@ -18,7 +40,7 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
   useEffect(() => {
     if (!isLocalPlayer) return;
     
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       switch(e.key) {
         case 'w': case 'ArrowUp':
           keys.current.forward = true;
@@ -35,7 +57,7 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
       }
     };
     
-    const handleKeyUp = (e) => {
+    const handleKeyUp = (e: KeyboardEvent) => {
       switch(e.key) {
         case 'w': case 'ArrowUp':
           keys.current.forward = false;
@@ -126,12 +148,12 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
       {/* First-person camera for local player */}
       {isLocalPlayer && (
         <PerspectiveCamera
-          ref={cameraRef}
           makeDefault={true}
           position={[0, 1.0, 0]} // Position at eye level
           fov={75}
           near={0.1}
           far={1000}
+          ref={cameraRef as unknown as RefObject<THREE.PerspectiveCamera>}
         />
       )}
       
@@ -164,7 +186,7 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
           {/* Name tag for other players */}
           <sprite position={[0, 1.5, 0]} scale={[2, 0.5, 1]}>
             <spriteMaterial>
-              <canvasTexture attach="map" image={createNameTag(player.name || `Player ${player.id.substring(0, 4)}`)} />
+              <canvasTexture args={[createNameTag(player.name || `Player ${player.id.substring(0, 4)}`)]} attach="map" />
             </spriteMaterial>
           </sprite>
         </>
@@ -174,15 +196,17 @@ const Player = ({ player, isLocalPlayer, updatePosition }) => {
 };
 
 // Helper function to create name tag texture
-function createNameTag(playerName) {
+function createNameTag(playerName: string): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   canvas.width = 256;
   canvas.height = 64;
-  context.font = '48px Arial';
-  context.fillStyle = 'white';
-  context.textAlign = 'center';
-  context.fillText(playerName, 128, 48);
+  if (context) {
+    context.font = '48px Arial';
+    context.fillStyle = 'white';
+    context.textAlign = 'center';
+    context.fillText(playerName, 128, 48);
+  }
   return canvas;
 }
 
